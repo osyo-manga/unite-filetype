@@ -5,6 +5,17 @@ function! unite#sources#filetype#define()
 endfunction
 
 
+function! s:unique(list)
+	let result = []
+	for var in a:list
+		if index(result, var) == -1
+			call add(result, var)
+		endif
+	endfor
+	return result
+endfunction
+
+
 function! s:filetypes()
 	if !exists("s:filetypes_cache")
 		let s:filetypes_cache = s:unique(map(split(globpath(&rtp, "syntax/**/*.vim") . "\n" . globpath(&rtp, "indent/**/*.vim"), "\n"), "fnamemodify(v:val, ':t:r')"))
