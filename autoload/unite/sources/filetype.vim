@@ -5,20 +5,12 @@ function! unite#sources#filetype#define()
 endfunction
 
 
-function! s:unique(list)
-	let result = []
-	for var in a:list
-		if index(result, var) == -1
-			call add(result, var)
-		endif
-	endfor
-	return result
-endfunction
-
-
 function! s:filetypes()
 	if !exists("s:filetypes_cache")
-		let s:filetypes_cache = s:unique(map(split(globpath(&rtp, "syntax/**/*.vim") . "\n" . globpath(&rtp, "indent/**/*.vim"), "\n"), "fnamemodify(v:val, ':t:r')"))
+		let s:filetypes_cache = unite#util#uniq(map(split(
+\			globpath(&rtp, "syntax/**/*.vim") . "\n" .
+\			globpath(&rtp, "indent/**/*.vim"), "\n"),
+\			"fnamemodify(v:val, ':t:r')"))
 	endif
 	return copy(s:filetypes_cache)
 endfunction
@@ -26,7 +18,7 @@ endfunction
 
 let s:source = {
 \	"name" : "filetype",
-\	"description" : "all filetype disp & set filetype",
+\	"description" : "candidates from all filetype disp & set the filetype",
 \	"default_action" : "set_filetype",
 \	"action_table" : {
 \		"set_filetype" : {
@@ -37,9 +29,9 @@ let s:source = {
 \}
 
 
-function! s:source.action_table.set_filetype.func(candidates)
-	let bufnr = get(get(b:, "unite", {}), "prev_bufnr", bufnr("%"))
-	call setbufvar(bufnr, "&filetype", a:candidates.action__filetype)
+function! s:source.action_table.set_filetype.func(candidate)
+	let bufnr = get(unite#get_current_unite(), "prev_bufnr", bufnr("%"))
+	call setbufvar(bufnr, "&filetype", a:candidate.action__filetype)
 endfunction
 
 
