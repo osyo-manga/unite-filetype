@@ -35,12 +35,14 @@ function! s:source.action_table.set_filetype.func(candidate)
 endfunction
 
 
-function! s:source.gather_candidates(args, context)
+function! s:source.change_candidates(args, context)
 	return map(s:filetypes(),'{
 \		"word" : v:val,
 \		"action__filetype" : v:val
-\}')
+\}') + ((a:context.input != "" &&
+\		index(s:filetypes(), a:context.input) < 0) ? [{
+\		"word" : "[new filetype] " . a:context.input,
+\		"action__filetype" : a:context.input
+\}] : [])
 endfunction
-
-
 
