@@ -1,7 +1,7 @@
 scriptencoding utf-8
 
 function! unite#sources#filetype#define()
-	return s:source
+	return [s:source, s:source_new]
 endfunction
 
 
@@ -35,12 +35,22 @@ function! s:source.action_table.set_filetype.func(candidate)
 endfunction
 
 
-function! s:source.gather_candidates(args, context)
+function! s:source.change_candidates(args, context)
 	return map(s:filetypes(),'{
 \		"word" : v:val,
 \		"action__filetype" : v:val
 \}')
 endfunction
 
+let s:source_new = deepcopy(s:source)
+let s:source_new.name = "filetype/new"
+let s:source_new.description = "candidates from input filetype & set the filetype"
 
+function! s:source_new.change_candidates(args, context)
+	return ((a:context.input != "" &&
+\		index(s:filetypes(), a:context.input) < 0) ? [{
+\		"word" : "[new filetype] " . a:context.input,
+\		"action__filetype" : a:context.input
+\}] : [])
+endfunction
 
